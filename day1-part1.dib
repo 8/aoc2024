@@ -1,0 +1,30 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"languageName":"csharp","name":"csharp"}]}}
+
+#!csharp
+
+using System.IO;
+
+(Int64[] Left, Int64[] Right) GetGroups(string[] lines)
+{
+  var numbers = lines.Select(l => l.Split(" ", StringSplitOptions.RemoveEmptyEntries));
+
+  return (
+    numbers.Select(n => Convert.ToInt64(n[0])).Order().ToArray(),
+    numbers.Select(n => Convert.ToInt64(n[1])).Order().ToArray()
+  );
+}
+
+Int64 GetDistance(Int64[] left, Int64[] right) =>
+  left.Zip(right).Select(t => Math.Abs(t.First-t.Second)).Sum();
+
+Int64 Day(string path)
+{
+  var lines = File.ReadAllLines(path);
+  var (left, right) = GetGroups(lines);
+  return GetDistance(left, right);
+}
+
+Console.WriteLine(Day("01-ex.txt"));
+Console.WriteLine(Day("01.txt"));

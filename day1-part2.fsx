@@ -2,15 +2,6 @@ open System
 open System.IO
 open System.Collections.Generic
 
-let example = """
-3   4
-4   3
-2   5
-1   3
-3   9
-3   3
-"""
-
 let getGroups (lines: string array) =
   let numbers =
     lines
@@ -30,8 +21,8 @@ let getSimilarityScore (left, right) =
   |> Array.map (fun n -> (numberCount.TryGetValue(n) |> snd) * n)
   |> Array.sum
 
-example
-|> (fun s -> s.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+"01-ex.txt"
+|> File.ReadAllLines
 |> getGroups
 |> getSimilarityScore
 

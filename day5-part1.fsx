@@ -21,7 +21,7 @@ let day5 file =
 
   let isValid (numbers: int array) =
     let mutable ret = true
-    printfn "numbers: %A" numbers
+    // printfn "numbers: %A" numbers
     for i in 0..numbers.Length-1 do
       let remaining =  numbers.[i+1..]
       let forbidden = sortRules.TryFind numbers.[i] |> Option.defaultValue Array.empty
@@ -36,5 +36,4 @@ let day5 file =
   |> Array.sum
 
 day5 "05-ex.txt"
-
 day5 "05.txt"

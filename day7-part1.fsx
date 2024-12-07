@@ -12,7 +12,7 @@ module Operation =
     match op with
     | Add -> n1 + n2
     | Mul-> n1 * n2
-  let from (s: string) :  Operation array =
+  let from (s: string) : Operation array =
     let parseOp c =
       match c with
       | '0' -> Add
@@ -40,9 +40,6 @@ let allOps (count: int) : Operation array seq =
         |> Operation.from
   }
 
-allOps 4 |> Seq.toArray
-allOps 1 |> Seq.toArray
-
 module Equation =
   let from (line: string) =
     line.Split(':')
@@ -52,7 +49,6 @@ module Equation =
       n.[0].Split(' ', StringSplitOptions.RemoveEmptyEntries) |> Array.map int64)
     |> fun (r, n) -> { Equation.result = r; numbers = n }
   let isValid (eq: Equation) : bool =
-
     eq.numbers.Length-1
     |> allOps
     |> Seq.map (fun ops -> solve eq.numbers ops)

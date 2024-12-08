@@ -33,7 +33,6 @@ module Antenna =
     |> Array2D.toSeq
     |> Seq.choose fromPos
 
-
 let inGrid (maxY: int, maxX) (y: int, x: int) =
   (y >= 0 && y < maxY && x >= 0 && x < maxX)
 
@@ -45,23 +44,19 @@ let antinodes (maxY: int, maxX: int) (a1: Antenna, a2: Antenna) : seq<int*int> =
     snd a2 - snd a1
   )
 
+  let points (start: int*int) (vec: int*int) =
+    seq {
+      let mutable p = start
+      yield p
+      while true do
+        p <- fst p + fst vec, snd p + snd vec
+        yield p
+    }
+    |> Seq.takeWhile (inGrid (maxY, maxX))
+  
   seq {
-    let mutable h = a1
-    yield h
-    let back () = (fst h - fst d, snd h - snd d)
-    h <- back()
-    while (inGrid (maxY, maxX) h) do
-      printfn "back h: %A" h
-      yield h
-      h <- back()
-
-    h  <- a2
-    yield h
-    let forward () = (fst h + fst d, snd h + snd d)
-    h <- forward()
-    while (inGrid (maxY, maxX) h) do
-      yield h
-      h <- forward()
+    yield! points a1 (fst d * -1, snd d * -1)
+    yield! points a2 d
   }
 
 let day8 file =

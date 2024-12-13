@@ -18,6 +18,13 @@ let uncompressDiskmap (input: int seq) =
         yield (if i%2=0 then Some(i/2) else None)
   }
 
+let checksum compacted =
+  compacted
+  |> Seq.indexed
+  |> Seq.fold (fun s (i, n) ->
+      s + int64(i * (n |> Option.defaultValue 0))
+    ) 0L
+
 let day9 file =
   let n = numbersFromFile file
 
@@ -45,10 +52,7 @@ let day9 file =
     }
 
   compacted
-  |> Seq.indexed
-  |> Seq.fold (fun s (i, n) ->
-      s + int64(i * (n |> Option.defaultValue 0))
-    ) 0L
+  |> checksum
 
 "09-ex2.txt"
 |> day9

@@ -11,7 +11,6 @@ let uncompressDiskmap (input: int seq) =
   let input =
     input
     |> Seq.indexed
-
   seq {
     for (i, n) in input do
       for _ in 0..n-1 do
@@ -25,33 +24,31 @@ let checksum compacted =
       s + int64(i * (n |> Option.defaultValue 0))
     ) 0L
 
+let compact (diskmap: int option array) =
+  seq {
+    let mutable compactedBlockIndex = diskmap.Length
+    for i in 0..diskmap.Length-1 do
+      if i >= compactedBlockIndex then
+        yield None
+      else
+        match diskmap.[i] with
+        | Some(n) -> yield Some n
+        | None ->
+          let mutable b = None
+          for c in compactedBlockIndex-1..-1..i do
+            let item = diskmap.[c]
+            if b.IsNone && item.IsSome then
+              b <- item
+              compactedBlockIndex <- c
+          yield b
+  }
+
 let day9 file =
-  let n = numbersFromFile file
-
-  let diskmap =
-    uncompressDiskmap n
-    |> Seq.toArray
-
-  let compacted  =
-    seq {
-      let mutable compactedBlockIndex = diskmap.Length
-      for i in 0..diskmap.Length-1 do
-        if i >= compactedBlockIndex then
-          yield None
-        else
-          match diskmap.[i] with
-          | Some(n) -> yield Some n
-          | None ->
-            let mutable b = None
-            for c in compactedBlockIndex-1..-1..i do
-              let item = diskmap.[c]
-              if b.IsNone && item.IsSome then
-                b <- item
-                compactedBlockIndex <- c
-            yield b
-    }
-
-  compacted
+  file
+  |> numbersFromFile
+  |> uncompressDiskmap
+  |> Seq.toArray
+  |> compact
   |> checksum
 
 "09-ex2.txt"

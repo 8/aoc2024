@@ -112,8 +112,6 @@ let day15 file =
     |> Array.collect id
     |> Array.choose Move.from
 
-  let robot = robotFrom map
-
   let mutable map = map
   for move in moves do
     map <- moveRobot map move
@@ -125,7 +123,6 @@ let day15 file =
     |> Seq.map (fun (y,x,_) -> y*100+x)
     |> Seq.sum
 
-  // robot, map, moves, sum
   sum
 
 "15-ex2.txt"

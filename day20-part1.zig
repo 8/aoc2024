@@ -87,9 +87,9 @@ fn day20(allocator: Allocator, file_path: []const u8) !void {
 }
 
 pub fn main() !void {
-  var arena_allocator = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-  defer arena_allocator.deinit();
-  const allocator = arena_allocator.allocator();
+  var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+  const allocator = gpa.allocator();
+  defer _ = gpa.deinit();
 
   // try day20(allocator, "20-ex1.txt");
   try day20(allocator, "20.txt");

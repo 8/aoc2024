@@ -7,10 +7,12 @@ pub const Input = struct {
 
   pub fn init(file_path: []const u8, allocator: Allocator) !@This() {
     var file = try std.fs.cwd().openFile(file_path, .{});
-    const reader = file.reader();
+    defer file.close();
+
     var lines_list = std.ArrayList([]u8).init(allocator);
     defer lines_list.deinit();
 
+    const reader = file.reader();
     while (reader.readUntilDelimiterAlloc(allocator, '\n', 1024)) |line| {
       try lines_list.append(line);
     }
@@ -23,6 +25,7 @@ pub const Input = struct {
       .lines = try lines_list.toOwnedSlice(),
     };
   }
+
   pub fn deinit(self: @This()) void {
     for (self.lines) |line| {
       self.allocator.free(line);
@@ -63,5 +66,10 @@ pub const Pos = struct {
       .x = pos1.x - pos2.x,
       .y = pos1.y - pos2.y,
     };
+  }
+
+  pub fn eql(pos1: @This(), pos2: @This()) bool {
+    return pos1.x == pos2.x
+       and pos1.y == pos2.y;
   }
 };

@@ -6,8 +6,6 @@ fn print(comptime format: []const u8, args: anytype) !void {
   try stdout.print(format, args);
 }
 
-// const Wires = std.StringArrayHashMap(bool);
-
 const GateType = enum {
   AND,
   OR,

@@ -39,59 +39,45 @@ fn getMaxPatternLength(patterns: std.StringHashMap(void)) usize {
   return max;
 }
 
-// fn solve(line: []const u8, patterns: std.StringHashMap(void), max_pattern_length: usize, allocator: Allocator) !bool {
-
-//   var queue = std.ArrayList([]const u8).init(allocator);
-//   defer queue.deinit();
-//   try queue.append(line);
-
-//   while (queue.popOrNull()) |item| {
-
-//     for (0..(@min(item.len, max_pattern_length))) |i| {
-//       const s = item[0..i+1];
-
-//       if (patterns.contains(s)) {
-//         const rem = item[i+1..];
-
-//         if (rem.len == 0) {
-//           return true;
-//         }
-//         try queue.append(rem);
-//       }
-//     }
-//   }
-  
-//   return false;
-// }
-
 fn solve(line: []const u8, patterns: std.StringHashMap(void), max_pattern_length: usize, allocator: Allocator) !bool {
 
-  const Item = struct {
-    line: []const u8,
-    i: usize,
-  };
+  // the list of positions that we need to validate
+  var positions =  std.ArrayList(usize).init(allocator);
+  defer positions.deinit();
 
-  var queue = std.ArrayList(Item).init(allocator);
-  defer queue.deinit();
+  // the positions that we added to the queue
+  var processed = std.AutoArrayHashMap(usize, void).init(allocator);
+  defer processed.deinit();
 
-  try queue.append(.{.line = line, .i = 1});
+  // start with the full line
+  try positions.append(0);
+  try processed.put(0, {});
 
-  while (queue.popOrNull()) |item| {
+  // while we have positions to process
+  while (positions.popOrNull()) |position| {
 
-    const s = item.line[0..item.i];
-    // try print("checking: '{s}'\n", .{});
+    // try from 0 to max_pattern_length if we can find a part of it in the patterns
+    for (1..@min(max_pattern_length+1, line.len-position+1)) |l| {
 
-    if (patterns.contains(s)) {
-      const rem = item.line[item.i..];
-      try print("rem: '{s}\n'", .{rem});
-      if (rem.len == 0) {
-        return true;
+      // see if a part of the line starting at position...
+      const part = line[position..position+l];
+
+      // ...is a valid pattern
+      if (patterns.contains(part)) {
+        const new_position = position + part.len;
+
+        // if so, see if we are done
+        if (new_position == line.len) {
+          return true;
+
+        // else check if the new position was not already processed and if so process it
+        } else if (!processed.contains(new_position)) {
+          try positions.append(new_position);
+          try processed.put(new_position, {});
+        }
       }
-      try queue.append(.{.line = rem, .i = 1});
     }
-    else if (item.i < @min(item.line.len, max_pattern_length)) {
-      try queue.append(.{.line = item.line, .i = item.i+1});
-    }
+
   }
 
   return false;
@@ -105,12 +91,13 @@ fn day19(file_path: []const u8, allocator: Allocator) !void {
   var arena = std.heap.ArenaAllocator.init(allocator);
   defer arena.deinit();
   var patterns = std.StringHashMap(void).init(arena.allocator());
-  
+
   var reader = file.reader();
   var buf : [3000]u8 = undefined;
   var i: usize = 0;
   var possible_count: usize = 0;
   var max_pattern_length: usize = 0;
+
   while (reader.readUntilDelimiter(&buf, '\n')) |read| : (i+=1) {
     if (i == 0) {
       try readPatterns(read, &patterns, arena.allocator());
@@ -139,5 +126,5 @@ pub fn main() !void {
   var gpa = std.heap.GeneralPurposeAllocator(.{}){};
   const allocator = gpa.allocator();
   try day19("19-ex1.txt", allocator);
-  // try day19("19.txt", allocator);
+  try day19("19.txt", allocator);
 }

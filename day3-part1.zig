@@ -10,13 +10,6 @@ pub fn println(comptime format: []const u8, args: anytype) void {
   print(format ++ "\n", args);
 }
 
-const Mul = struct {
-  index: usize,
-  length: usize,
-  factor1: u32,
-  factor2: u32,
-};
-
 const indexOf = std.mem.indexOf;
 const isDigit = std.ascii.isDigit;
 const parseInt = std.fmt.parseInt;

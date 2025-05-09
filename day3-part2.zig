@@ -13,6 +13,7 @@ pub fn println(comptime format: []const u8, args: anytype) void {
 const indexOf = std.mem.indexOf;
 const isDigit = std.ascii.isDigit;
 const parseInt = std.fmt.parseInt;
+const startsWith = std.mem.startsWith;
 
 const TokenTypeTag = enum {
   Mul,
@@ -39,10 +40,7 @@ const TokenType = union(TokenTypeTag) {
 fn tokenize(haystack: []const u8, tokens: *std.ArrayList(TokenType)) !void {
   var index : usize = 0;
   while (index < haystack.len) : (index += 1) {
-    if (index+2 < haystack.len
-    and haystack[index+0] == 'm'
-    and haystack[index+1] == 'u'
-    and haystack[index+2] == 'l'){
+    if (startsWith(u8, haystack[index..], "mul")) {
       index += 2;
       try tokens.append(TokenTypeTag.Mul);
     } else if (haystack[index] == ',') {
@@ -62,17 +60,10 @@ fn tokenize(haystack: []const u8, tokens: *std.ArrayList(TokenType)) !void {
         .Number = try parseInt(u32, haystack[index..index+num_length], 10)};
       try tokens.append(number);
       index += num_length-1;
-    } else if(index+4 < haystack.len
-      and haystack[index+0] == 'd'
-      and haystack[index+1] == 'o'
-      and haystack[index+2] == 'n'
-      and haystack[index+3] == '\''
-      and haystack[index+4] == 't') {
+    } else if(startsWith(u8, haystack[index..], "don't")) {
       index += 4;
       try tokens.append(TokenTypeTag.Dont);
-    } else if (index+3 < haystack.len
-      and haystack[index+0] == 'd'
-      and haystack[index+1] == 'o') {
+    } else if (startsWith(u8, haystack[index..], "do")) {
       index+=1;
       try tokens.append(TokenTypeTag.Do);
     }

@@ -57,15 +57,13 @@ fn solve(file_path: []const u8, allocator: std.mem.Allocator) !void {
   var lines = std.ArrayList([]const u8).init(allocator);
   try aoc.read_file_to_list(file_path, &lines, allocator);
 
+  // count the XMAS
   var result: i64 = 0;
   var buf: [4]u8 = undefined;
-  var y: i64 = 0;
-  var x: i64 = 0;
-  while (y < lines.items.len) : (y += 1) {
-    x = 0;
-    while (x < lines.items[@intCast(y)].len) : (x += 1) {
+  for (0..lines.items.len) |y|{
+    for (0..lines.items[@intCast(y)].len) |x| {
       for (directions) |d| {
-        const s = get_slice(lines, .{.x = x, .y = y}, &buf, d);
+        const s = get_slice(lines, .{.x = @intCast(x), .y = @intCast(y)}, &buf, d);
         if (std.mem.eql(u8, s, "XMAS")) {
           result += 1;
         }

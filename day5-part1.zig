@@ -16,12 +16,9 @@ const Lookup = std.AutoHashMap(u32, *std.AutoHashMap(u32, void));
 
 fn is_valid(numbers: []const u32, lookup: *Lookup) bool {
   for (numbers, 0..) |number, i| {
-    // aoc.println("looking for {}", .{number});
     if (lookup.get(number)) |forbidden| {
-      // aoc.println("found {} forbidden numbers for {}", .{forbidden.count(), number});
       for (numbers[i+1..]) |next_number| {
         if (forbidden.contains(next_number)) {
-          // aoc.println("forbidden for {} does not contain {}", .{number, next_number});
           return false;
         }
       }
@@ -49,19 +46,14 @@ fn read_lines_to_lookup(lines: [][]const u8, lookup: *Lookup, allocator: std.mem
       } else if (i == 1) {
         const n2 = try std.fmt.parseInt(u32, part, 10);
         var forbidden: *std.AutoHashMap(u32, void) = undefined;
-        // aoc.println("n1: {}, n2: {}", .{n1, n2});
         if (lookup.get(n2)) |f| {
           forbidden = f;
-          // aoc.println("found forbidden for {}", .{n2});
         } else {
           forbidden = try allocator.create(std.AutoHashMap(u32, void));
           forbidden.* = std.AutoHashMap(u32, void).init(allocator);
           try lookup.put(n2, forbidden);
-          // aoc.println("put: {}, fo", .{n2});
         }
-        // aoc.println("adding {} to forbidden for {}", .{n1, n2});
         try forbidden.put(n1, {});
-        // aoc.println("forbidden for: {} has now count: {}", .{n2, forbidden.count()});
       }
     }
   }
@@ -91,11 +83,8 @@ fn solve(file_path: []const u8, allocator: std.mem.Allocator) !void {
 
     if (is_valid(numbers.items, &lookup)) {
       result += numbers.items[(numbers.items.len / 2)];
-      // aoc.println("numbers: {any}", .{numbers.items});
-      // aoc.println("valid: {s}", .{line});
     }
   }
 
   aoc.println("result: {}",.{result});
-  // aoc.println("lines.len: {}", .{lines.items.len});
 }
